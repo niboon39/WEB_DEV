@@ -9,7 +9,7 @@ from .forms import BuyForm, UpdateForm, PaymentForm, BookingForm
 from .models import Menu,Cart,Ordercart, Room, Booking
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# from pypromptpay import qr_code
+from pypromptpay import qr_code
 import datetime
 import os
 import cv2 as cv
@@ -202,17 +202,17 @@ def payment(request):
 
     account_ = "0951847769"
     current_time = str(datetime.datetime.now()).replace(" ","_").replace(":","-").replace(".","-")
-    path = 'C:/Users/Niboon/Desktop/web_programming/WEB_DEV/web_programming/media/qrcode'+user.username # edit 
+    path = 'media/qrcode'+user.username # edit 
     if os.path.isdir(path):
         pass
     else:
         os.mkdir(path)
-    path = 'C:/Users/Niboon/Desktop/web_programming/WEB_DEV/web_programming/media/qrcode'+user.username+'/'+current_time+'.png' # edit 
+    path = 'media/qrcode'+user.username+'/'+current_time+'.png' # edit 
     money_ = str(bill)
     currency_ = "THB"
     qr_code(account=account_, one_time=True, path_qr_code = path ,country="TH",money=money_,currency=currency_)
 
-    urlqr = ["/media/qrcode/"+user.username+"/"+current_time+".png"]
+    urlqr = ["/media/qrcode"+user.username+"/"+current_time+".png"] # call Urls qr_code 
 
     if 'submit' in request.POST:
         form = PaymentForm(request.POST, request.FILES)
@@ -224,10 +224,10 @@ def payment(request):
             slip = form.cleaned_data['slip']
             Order = Ordercart(user=user,placed_at=time,slip=slip,total_price=bill,payment_status="P")
             Order.save()
-            path = 'C:/Users/Niboon/Desktop/web_programming/WEB_DEV/web_programming/media/slip'+str(slip) # edit 
+            path = 'media/slip/'+str(slip) # edit 
             print(path)
             img = cv.imread(path , cv.IMREAD_UNCHANGED )
-            ret , thresh = cv.threshold(img, 120, 255, cv.THRESH_BINARY)
+            ret , thresh = cv.threshold(img, 170, 255, cv.THRESH_BINARY)
             bank_acc = bank
             image = thresh
             dt = time
